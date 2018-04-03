@@ -36,4 +36,17 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("data", triggerData);
         sendBroadcast(intent);
     }
+
+    public void locationTrigger(View v) {
+
+    }
+
+    public void eventAddTrigger(View v) {
+
+    }
+
+    public void timeTrigger(View v) {
+
+    }
+
 }
