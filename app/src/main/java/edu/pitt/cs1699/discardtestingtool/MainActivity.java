@@ -1,14 +1,24 @@
 package edu.pitt.cs1699.discardtestingtool;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
+
+    Messenger mService = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +47,10 @@ public class MainActivity extends AppCompatActivity {
         sendBroadcast(intent);
     }
 
-    public void locationTrigger(View v) {
+    public void locationTrigger(View v) throws RemoteException {
+        Intent intent = new Intent("edu.pitt.cs1699.discard.LOCATION");
+        intent.setPackage("edu.pitt.cs1699.discard");
+        this.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
     }
 
@@ -49,4 +62,40 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private ServiceConnection mConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            mService = new Messenger(service);
+            Message message = new Message();
+            message.what = 1;
+
+            String triggerData = "";
+
+            try {
+                triggerData = new JSONObject()
+                        .put("Location", new JSONObject()
+                                .put("Lat", "40.4406")
+                                .put("Long", "-79.9958"))
+                        .toString();
+
+            } catch (JSONException j) {
+                j.printStackTrace();
+            }
+
+            Bundle bundle = new Bundle();
+            bundle.putString("location",triggerData);
+
+            message.obj = bundle;
+            try {
+                mService.send(message);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+
+            mService = null;
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            mService = null;
+        }
+    };
 }
