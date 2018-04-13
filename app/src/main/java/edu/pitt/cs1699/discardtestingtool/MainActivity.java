@@ -58,8 +58,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void timeTrigger(View v) {
-
+    public void timeTrigger(View v) throws RemoteException {
+        Intent intent = new Intent("edu.pitt.cs1699.discard.TIME");
+        intent.setPackage("edu.pitt.cs1699.discard");
+        this.bindService(intent, timeConnection, Context.BIND_AUTO_CREATE);
     }
 
     private ServiceConnection locationConnection = new ServiceConnection() {
@@ -83,6 +85,44 @@ public class MainActivity extends AppCompatActivity {
 
             Bundle bundle = new Bundle();
             bundle.putString("location",triggerData);
+
+            message.obj = bundle;
+            try {
+                mService.send(message);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+
+            mService = null;
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            mService = null;
+        }
+    };
+
+
+    private ServiceConnection timeConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            mService = new Messenger(service);
+            Message message = new Message();
+            message.what = 2;
+
+            String triggerData = "";
+
+            try {
+                triggerData = new JSONObject()
+                        .put("Time", new JSONObject()
+                                .put("Current Date", "2018-04-13")
+                                .put("Current Time", "10:00:00"))
+                        .toString();
+
+            } catch (JSONException j) {
+                j.printStackTrace();
+            }
+
+            Bundle bundle = new Bundle();
+            bundle.putString("time",triggerData);
 
             message.obj = bundle;
             try {
