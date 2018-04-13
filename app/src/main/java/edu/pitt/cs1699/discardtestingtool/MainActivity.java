@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     public void locationTrigger(View v) throws RemoteException {
         Intent intent = new Intent("edu.pitt.cs1699.discard.LOCATION");
         intent.setPackage("edu.pitt.cs1699.discard");
-        this.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        this.bindService(intent, locationConnection, Context.BIND_AUTO_CREATE);
 
     }
 
@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private ServiceConnection mConnection = new ServiceConnection() {
+    private ServiceConnection locationConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             mService = new Messenger(service);
             Message message = new Message();
