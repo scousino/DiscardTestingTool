@@ -55,7 +55,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void eventAddTrigger(View v) {
-
+        Intent intent = new Intent();
+        intent.setAction("edu.pitt.cs1699.discard.EVENT");
+        String triggerData = "";
+        try {
+            triggerData = new JSONObject()
+                    .put("Location", new JSONObject()
+                            .put("Lat", "40.4468")
+                            .put("Long", "-80.0158"))
+                    .put("Time", new JSONObject()
+                            .put("Start Date", "2018-08-14")
+                            .put("Start Time", "12:30:00")
+                            .put("End Date", "2018-08-14")
+                            .put("End Time", "17:35:00"))
+                    .put("Details", new JSONObject()
+                            .put("ChatID", "NEWTESTID")
+                            .put("Name", "Steelers Football Game")
+                            .put("Description", "Chat for the Steelers game against the Cleveland Browns"))
+                    .toString();
+        } catch (JSONException je) {
+            je.printStackTrace();
+        }
+        intent.putExtra("data", triggerData);
+        startActivity(intent);
     }
 
     public void timeTrigger(View v) throws RemoteException {
