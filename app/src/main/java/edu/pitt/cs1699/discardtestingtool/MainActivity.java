@@ -55,11 +55,35 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void eventAddTrigger(View v) {
-
+        Intent intent = new Intent();
+        intent.setAction("edu.pitt.cs1699.discard.EVENT");
+        String triggerData = "";
+        try {
+            triggerData = new JSONObject()
+                    .put("Location", new JSONObject()
+                            .put("Lat", "0")
+                            .put("Long", "0"))
+                    .put("Time", new JSONObject()
+                            .put("Start Date", "2018-08-14")
+                            .put("Start Time", "12:30:00")
+                            .put("End Date", "2018-08-14")
+                            .put("End Time", "17:35:00"))
+                    .put("Details", new JSONObject()
+                            .put("ChatID", "NEWTESTID")
+                            .put("Name", "Steelers Football Game")
+                            .put("Description", "Chat for the Steelers game against the Cleveland Browns"))
+                    .toString();
+        } catch (JSONException je) {
+            je.printStackTrace();
+        }
+        intent.putExtra("data", triggerData);
+        startActivity(intent);
     }
 
-    public void timeTrigger(View v) {
-
+    public void timeTrigger(View v) throws RemoteException {
+        Intent intent = new Intent("edu.pitt.cs1699.discard.TIME");
+        intent.setPackage("edu.pitt.cs1699.discard");
+        this.bindService(intent, timeConnection, Context.BIND_AUTO_CREATE);
     }
 
     private ServiceConnection locationConnection = new ServiceConnection() {
@@ -83,6 +107,44 @@ public class MainActivity extends AppCompatActivity {
 
             Bundle bundle = new Bundle();
             bundle.putString("location",triggerData);
+
+            message.obj = bundle;
+            try {
+                mService.send(message);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+
+            mService = null;
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            mService = null;
+        }
+    };
+
+
+    private ServiceConnection timeConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            mService = new Messenger(service);
+            Message message = new Message();
+            message.what = 2;
+
+            String triggerData = "";
+
+            try {
+                triggerData = new JSONObject()
+                        .put("Time", new JSONObject()
+                                .put("Current Date", "2018-04-13")
+                                .put("Current Time", "10:00:00"))
+                        .toString();
+
+            } catch (JSONException j) {
+                j.printStackTrace();
+            }
+
+            Bundle bundle = new Bundle();
+            bundle.putString("time",triggerData);
 
             message.obj = bundle;
             try {
