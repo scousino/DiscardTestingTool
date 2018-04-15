@@ -61,8 +61,8 @@ public class MainActivity extends AppCompatActivity {
         try {
             triggerData = new JSONObject()
                     .put("Location", new JSONObject()
-                            .put("Lat", "40.4468")
-                            .put("Long", "-80.0158"))
+                            .put("Lat", "0")
+                            .put("Long", "0"))
                     .put("Time", new JSONObject()
                             .put("Start Date", "2018-08-14")
                             .put("Start Time", "12:30:00")
